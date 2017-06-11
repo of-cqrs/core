@@ -4,8 +4,7 @@ namespace CQRS.Core.Commands
 {
     public interface ICommandDispatcher
     {
-        void Dispatch<TCommand>(TCommand command) where TCommand:CommandBase;
-        TResult Dispatch<TCommand, TResult>(TCommand command) where TCommand : CommandBase;
-        Task DispatchAsync<TCommand>(TCommand command) where TCommand : CommandBase;
+        TResult Dispatch<TCommand, TResult>(TCommand command);
+        Task<TResult> DispatchAsync<TCommand, TResult>(TCommand command);
     }
 }
