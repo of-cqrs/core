@@ -1,6 +1,6 @@
 ﻿using CQRS.Core.Commands;
 
-namespace CQRS.Core.Provider
+namespace CQRS.Core.Provider.Interfaces
 {
     public interface ICommandProvider
     {

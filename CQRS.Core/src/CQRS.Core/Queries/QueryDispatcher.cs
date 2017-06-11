@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CQRS.Core.Provider;
+using CQRS.Core.Provider.Interfaces;
 
 namespace CQRS.Core.Queries
 {
