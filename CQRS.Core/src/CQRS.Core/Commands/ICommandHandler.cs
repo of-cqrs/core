@@ -2,14 +2,10 @@
 
 namespace CQRS.Core.Commands
 {
-    public interface ICommandHandler<TCommand>
-    {
-        void Execute(TCommand command);
-    }
 
-    public interface IAsyncCommandHandler<TCommand>
+    public interface IAsyncCommandHandler<TCommand, TResult>
     {
-        Task Execute(TCommand command);
+        Task<TResult> ExecuteAsync(TCommand command);
     }
 
     public interface ICommandHandler<TCommand, TResult>

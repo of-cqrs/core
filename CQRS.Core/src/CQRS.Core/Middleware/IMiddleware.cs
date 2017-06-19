@@ -1,9 +1,9 @@
-﻿using CQRS.Core.Commands;
+﻿using CQRS.Core.Models;
 
 namespace CQRS.Core.Middleware
 {
     public interface IMiddleware
     {
-        void Apply(CommandBase command);
+        void Apply<T,Z>(ActionContext<T,Z> command);
     }
 }
