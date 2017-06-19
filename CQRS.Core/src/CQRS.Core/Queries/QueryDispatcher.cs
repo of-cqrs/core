@@ -14,7 +14,6 @@ namespace CQRS.Core.Queries
 
         public TResult Dispatch<TQuery, TResult>(TQuery query)
         {
-            //TODO insert middleware 
             var handler = _queryProvider.GetQuery<IQueryHandler<TQuery, TResult>, TQuery, TResult>();
             return handler.Retrieve(query);
         }
