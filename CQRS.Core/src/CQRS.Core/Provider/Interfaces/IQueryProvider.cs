@@ -1,6 +1,6 @@
 ﻿using CQRS.Core.Queries;
 
-namespace CQRS.Core.Provider
+namespace CQRS.Core.Provider.Interfaces
 {
     public interface IQueryProvider
     {
