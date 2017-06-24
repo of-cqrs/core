@@ -15,6 +15,8 @@ namespace CQRS.Core.Extensions
             serviceCollection.AddSingleton<ICommandProvider, DefaultCommandProvider>();
             serviceCollection.AddSingleton<IQueryProvider, DefaultQueryProvider>();
             serviceCollection.AddSingleton<IMiddlewareResolver, DefaultMiddlewareResolver>();
+            serviceCollection.AddSingleton<IActionFacade, ActionFacade>();
+
 
             return serviceCollection;
         }
