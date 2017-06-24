@@ -6,7 +6,7 @@ using CQRS.Core.Queries;
 
 namespace CQRS.Core
 {
-    public class ActionFacade
+    public class ActionFacade : IActionFacade
     {
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IQueryDispatcher _queryDispatcher;

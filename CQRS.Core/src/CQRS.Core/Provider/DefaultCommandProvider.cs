@@ -13,14 +13,10 @@ namespace CQRS.Core.Provider
             _serviceProvider = serviceProvider;
         }
 
-        public T GetCommand<T, TCommand>() where T : ICommandHandler<TCommand>
-        {
-            return (T)_serviceProvider.GetService(typeof(ICommandHandler<TCommand>));
-        }
 
-        public T GetAsyncCommand<T, TCommand>() where T : IAsyncCommandHandler<TCommand>
+        public T GetAsyncCommand<T, TCommand, TResult>() where T : IAsyncCommandHandler<TCommand, TResult>
         {
-            return (T)_serviceProvider.GetService(typeof(IAsyncCommandHandler<TCommand>));
+            return (T) _serviceProvider.GetService(typeof(IAsyncCommandHandler<TCommand, TResult>));
         }
 
         public T GetCommand<T, TCommand, TResult>() where T : ICommandHandler<TCommand, TResult>
