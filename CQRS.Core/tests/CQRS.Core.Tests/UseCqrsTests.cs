@@ -25,5 +25,23 @@ namespace CQRS.Core.Tests
 
             Assert.NotNull(actionFacade);
         }
+
+        [Fact]
+        public void AddCQRS_WithAnonymusMiddleware_ShouldeCalled()
+        {
+            bool triggerred = false;
+            var servceCollection = new ServiceCollection();
+            servceCollection.AddCQRS(builder => builder.UseMiddleware((next) =>
+            {
+                return async (context) =>
+                {
+                    triggerred = true;
+                    await next(context);
+                };
+            }));
+
+            //TODO Dispatch some action
+            Assert.True(triggerred);
+        }
     }
 }

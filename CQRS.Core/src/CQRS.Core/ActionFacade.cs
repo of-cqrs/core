@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CQRS.Core.Commands;
+using CQRS.Core.Extensions;
 using CQRS.Core.Models;
 using CQRS.Core.Queries;
 
@@ -11,7 +12,7 @@ namespace CQRS.Core
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IQueryDispatcher _queryDispatcher;
 
-        public ActionFacade(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
+        public ActionFacade(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, ICQRSBuilder builder)
         {
             _commandDispatcher = commandDispatcher ?? throw new ArgumentException(nameof(commandDispatcher));
             _queryDispatcher = queryDispatcher ?? throw new ArgumentException(nameof(queryDispatcher));
@@ -19,7 +20,7 @@ namespace CQRS.Core
 
         public async Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TResult : ActionResult
         {
-            var context = new ActionContext<TQuery, TResult>() { Type = ActionType.Query, Action = query};
+            var context = new ActionContext<TQuery, TResult>() { Type = ActionType.Query, Action = query };
             await DispatchAsync(context);
 
             return context.Result;
@@ -27,7 +28,7 @@ namespace CQRS.Core
 
         public TResult Query<TQuery, TResult>(TQuery query) where TResult : ActionResult
         {
-            var context = new ActionContext<TQuery, TResult>() {Type = ActionType.Query, Action = query};
+            var context = new ActionContext<TQuery, TResult>() { Type = ActionType.Query, Action = query };
             Dispatch(context);
             return context.Result;
         }
@@ -40,11 +41,16 @@ namespace CQRS.Core
             return context.Result;
         }
 
-            public TCommandResult Run<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult
+        public TCommandResult Run<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult
         {
-            var context = new ActionContext<TCommand, TCommandResult>() { Type = ActionType.Command, Action = command};
+            var context = new ActionContext<TCommand, TCommandResult>() { Type = ActionType.Command, Action = command };
             Dispatch(context);
             return context.Result;
+        }
+
+        private async Task DispatchAsync(ActionContextBase context)
+        {
+
         }
 
         private async Task DispatchAsync<T, Z>(ActionContext<T, Z> context)

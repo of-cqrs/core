@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using CQRS.Core.Models;
 
 namespace CQRS.Core.Queries
 {
@@ -6,5 +8,7 @@ namespace CQRS.Core.Queries
     {
         TResult Dispatch<TQuery, TResult>(TQuery query);
         Task<TResult> DispatchAsync<TQuery, TResult>(TQuery query);
+
+        Task<object> DispatchAsync(ActionContextBase contextBase);
     }
 }

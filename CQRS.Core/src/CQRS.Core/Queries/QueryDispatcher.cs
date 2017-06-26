@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CQRS.Core.Models;
 using CQRS.Core.Provider.Interfaces;
 
 namespace CQRS.Core.Queries
@@ -22,6 +23,11 @@ namespace CQRS.Core.Queries
         {
             var handler = _queryProvider.GetAsyncQuery<IAsyncQueryHandler<TQuery, TResult>, TQuery, TResult>();
             return await handler.Retrieve(query);
+        }
+
+        public Task<object> DispatchAsync(ActionContextBase contextBase)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
