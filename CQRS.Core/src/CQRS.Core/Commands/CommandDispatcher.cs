@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CQRS.Core.Models;
 using CQRS.Core.Provider;
 using CQRS.Core.Provider.Interfaces;
 
@@ -13,7 +14,7 @@ namespace CQRS.Core.Commands
             _commandProvider = commandProvider;
         }
 
-        public TResult Dispatch<TCommand, TResult>(TCommand command)
+        public TResult Dispatch<TCommand, TResult>(TCommand command) where TCommand : ActionBase where TResult : ActionResult
         {
             var handler = _commandProvider.GetCommand<ICommandHandler<TCommand, TResult>, TCommand, TResult>();
             var result = handler.Execute(command);
@@ -21,7 +22,7 @@ namespace CQRS.Core.Commands
             return result;
         }
 
-        public async Task<TResult> DispatchAsync<TCommand, TResult>(TCommand command)
+        public async Task<TResult> DispatchAsync<TCommand, TResult>(TCommand command) where TCommand : ActionBase where TResult : ActionResult
         {
             var handler = _commandProvider.GetAsyncCommand<IAsyncCommandHandler<TCommand, TResult>, TCommand, TResult>();
             var result = await handler.ExecuteAsync(command);

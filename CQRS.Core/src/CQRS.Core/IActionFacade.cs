@@ -5,9 +5,9 @@ namespace CQRS.Core
 {
     public interface IActionFacade
     {
-        Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TResult : ActionResult;
-        TResult Query<TQuery, TResult>(TQuery query) where TResult : ActionResult;
-        Task<TCommandResult> RunAsync<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult;
-        TCommandResult Run<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult;
+        Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TResult : ActionResult where TQuery : ActionBase;
+        TResult Query<TQuery, TResult>(TQuery query) where TResult : ActionResult where TQuery : ActionBase;
+        Task<TCommandResult> RunAsync<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult where TCommand : ActionBase;
+        TCommandResult Run<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult where TCommand : ActionBase;
     }
 }

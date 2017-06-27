@@ -7,9 +7,6 @@ namespace CQRS.Core.Models
 
     public class ActionContext<TAction, TResult> : ActionContextBase
     {
-        public TAction Action { get; set; }
-        public TResult Result { get; set; }
-
         public ActionContext() : base(typeof(TAction), typeof(TResult))
         {
         }
@@ -19,6 +16,8 @@ namespace CQRS.Core.Models
     {
         public ActionType Type { get; set; }
 
+        public ActionBase Action { get; set; }
+        public ActionResult Result { get; set; }
         public Type ResultType { get; }
         public Type ActionType { get; }
 

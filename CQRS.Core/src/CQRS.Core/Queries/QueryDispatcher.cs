@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CQRS.Core.Models;
 using CQRS.Core.Provider.Interfaces;
 
@@ -19,7 +20,7 @@ namespace CQRS.Core.Queries
             return handler.Retrieve(query);
         }
 
-        public async Task<TResult> DispatchAsync<TQuery, TResult>(TQuery query)
+        public async Task<TResult> DispatchAsync<TQuery, TResult>(TQuery query) where TQuery : ActionBase where TResult : ActionResult
         {
             var handler = _queryProvider.GetAsyncQuery<IAsyncQueryHandler<TQuery, TResult>, TQuery, TResult>();
             return await handler.Retrieve(query);

@@ -23,7 +23,7 @@ namespace CQRS.Core.Extensions
             serviceCollection.AddSingleton<IQueryProvider, DefaultQueryProvider>();
             serviceCollection.AddSingleton<IMiddlewareResolver, DefaultMiddlewareResolver>();
             serviceCollection.AddSingleton<IActionFacade, ActionFacade>();
-            serviceCollection.AddSingleton(builder);
+            serviceCollection.AddSingleton<ICQRSBuilder>(builder);
 
             return serviceCollection;
         }

@@ -3,80 +3,102 @@ using System.Threading.Tasks;
 using CQRS.Core.Commands;
 using CQRS.Core.Extensions;
 using CQRS.Core.Models;
+using CQRS.Core.Provider.Interfaces;
 using CQRS.Core.Queries;
 
 namespace CQRS.Core
 {
     public class ActionFacade : IActionFacade
     {
-        private readonly ICommandDispatcher _commandDispatcher;
-        private readonly IQueryDispatcher _queryDispatcher;
+        private readonly ICQRSBuilder _builder;
+        private readonly ICommandProvider _commandProvider;
+        private readonly IQueryProvider _queryProvider;
 
-        public ActionFacade(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, ICQRSBuilder builder)
+
+        public ActionFacade(ICommandProvider commandProvider, IQueryProvider queryProvider, ICQRSBuilder builder)
         {
-            _commandDispatcher = commandDispatcher ?? throw new ArgumentException(nameof(commandDispatcher));
-            _queryDispatcher = queryDispatcher ?? throw new ArgumentException(nameof(queryDispatcher));
+            _commandProvider = commandProvider ?? throw new ArgumentException(nameof(commandProvider));
+            _queryProvider = queryProvider ?? throw new ArgumentException(nameof(queryProvider));
+            _builder = builder ?? throw new ArgumentException(nameof(builder));
         }
 
-        public async Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TResult : ActionResult
-        {
-            var context = new ActionContext<TQuery, TResult>() { Type = ActionType.Query, Action = query };
-            await DispatchAsync(context);
-
-            return context.Result;
-        }
-
-        public TResult Query<TQuery, TResult>(TQuery query) where TResult : ActionResult
+        public async Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TResult : ActionResult where TQuery : ActionBase
         {
             var context = new ActionContext<TQuery, TResult>() { Type = ActionType.Query, Action = query };
-            Dispatch(context);
-            return context.Result;
+            var handler = _queryProvider.GetAsyncQuery<IAsyncQueryHandler<TQuery, TResult>, TQuery, TResult>() as IAsyncQueryHandler<ActionBase, ActionResult>;
+            if(handler == null)
+                throw new ArgumentException($"Handler for {typeof(TQuery)} and with expected result {typeof(TResult)} is not registered.");
+
+            async Task Action(ActionContextBase actionContext)
+            {
+                var result = await handler.Retrieve(actionContext.Action);
+                actionContext.Result = result;
+            }
+
+            var endpoint = _builder.BuildEndpoint(Action);
+            await endpoint(context);
+
+            return context.Result as TResult;
         }
 
-        public async Task<TCommandResult> RunAsync<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult
+        public TResult Query<TQuery, TResult>(TQuery query) where TResult : ActionResult where TQuery : ActionBase
+        {
+            var context = new ActionContext<TQuery, TResult>() { Type = ActionType.Query, Action = query };
+            var handler = _queryProvider.GetQuery<IQueryHandler<TQuery, TResult>, TQuery, TResult>() as IQueryHandler<ActionBase, ActionResult>;
+            if (handler == null)
+                throw new ArgumentException($"Handler for {typeof(TQuery)} and with expected result {typeof(TResult)} is not registered.");
+
+            Task Action(ActionContextBase actionContext)
+            {
+                var result = handler.Retrieve(actionContext.Action);
+                actionContext.Result = result;
+                return Task.CompletedTask;
+            }
+
+            var endpoint = _builder.BuildEndpoint(Action);
+            endpoint(context).Wait();
+
+            return context.Result as TResult;
+        }
+
+        public async Task<TCommandResult> RunAsync<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult where TCommand : ActionBase
         {
             var context = new ActionContext<TCommand, TCommandResult>() { Type = ActionType.Command, Action = command };
-            await DispatchAsync(context);
+            var handler = _commandProvider.GetAsyncCommand<IAsyncCommandHandler<TCommand, TCommandResult>, TCommand, TCommandResult>();
+            if (handler == null)
+                throw new ArgumentException($"Handler for {typeof(TCommand)} and with expected result {typeof(TCommandResult)} is not registered.");
 
-            return context.Result;
+            async Task Action(ActionContextBase actionContext)
+            {
+                var result = await handler.ExecuteAsync((TCommand) actionContext.Action );
+                actionContext.Result = result;
+            }
+
+            var endpoint = _builder.BuildEndpoint(Action);
+            await endpoint(context);
+
+            return context.Result as TCommandResult;
         }
 
-        public TCommandResult Run<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult
+        public TCommandResult Run<TCommand, TCommandResult>(TCommand command) where TCommandResult : ActionResult where TCommand : ActionBase
         {
             var context = new ActionContext<TCommand, TCommandResult>() { Type = ActionType.Command, Action = command };
-            Dispatch(context);
-            return context.Result;
-        }
+            var handler = _commandProvider.GetCommand<ICommandHandler<TCommand, TCommandResult>, TCommand, TCommandResult>();
+            if (handler == null)
+                throw new ArgumentException($"Handler for {typeof(TCommand)} and with expected result {typeof(TCommandResult)} is not registered.");
 
-        private async Task DispatchAsync(ActionContextBase context)
-        {
-
-        }
-
-        private async Task DispatchAsync<T, Z>(ActionContext<T, Z> context)
-        {
-            switch (context.Type)
+            Task Action(ActionContextBase actionContext)
             {
-                case ActionType.Query:
-                    context.Result = await _queryDispatcher.DispatchAsync<T, Z>(context.Action);
-                    break;
-                case ActionType.Command:
-                    context.Result = await _commandDispatcher.DispatchAsync<T, Z>(context.Action);
-                    break;
+                var result = handler.Execute((TCommand)actionContext.Action);
+                actionContext.Result = result;
+                return Task.CompletedTask;
             }
+
+            var endpoint = _builder.BuildEndpoint(Action);
+            endpoint(context).Wait();
+
+            return context.Result as TCommandResult;
         }
 
-        private void Dispatch<T, Z>(ActionContext<T, Z> context)
-        {
-            switch (context.Type)
-            {
-                case ActionType.Query:
-                    context.Result = _queryDispatcher.Dispatch<T, Z>(context.Action);
-                    break;
-                case ActionType.Command:
-                    context.Result = _commandDispatcher.Dispatch<T, Z>(context.Action);
-                    break;
-            }
-        }
     }
 }
