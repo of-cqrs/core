@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CQRS.Core.Builders;
 using CQRS.Core.Commands;
-using CQRS.Core.Extensions;
 using CQRS.Core.Models;
 using CQRS.Core.Provider.Interfaces;
 using CQRS.Core.Queries;
 
 namespace CQRS.Core
 {
-    public class ActionFacade : IActionFacade
+    public class ActionDispatcher : IActionDispatcher
     {
         private readonly ICQRSBuilder _builder;
         private readonly ICommandProvider _commandProvider;
         private readonly IQueryProvider _queryProvider;
 
 
-        public ActionFacade(ICommandProvider commandProvider, IQueryProvider queryProvider, ICQRSBuilder builder)
+        public ActionDispatcher(ICommandProvider commandProvider, IQueryProvider queryProvider, ICQRSBuilder builder)
         {
             _commandProvider = commandProvider ?? throw new ArgumentException(nameof(commandProvider));
             _queryProvider = queryProvider ?? throw new ArgumentException(nameof(queryProvider));

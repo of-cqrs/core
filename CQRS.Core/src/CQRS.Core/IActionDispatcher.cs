@@ -3,7 +3,7 @@ using CQRS.Core.Models;
 
 namespace CQRS.Core
 {
-    public interface IActionFacade
+    public interface IActionDispatcher
     {
         Task<TResult> QueryAsync<TQuery, TResult>(TQuery query) where TResult : ActionResult where TQuery : ActionBase;
         TResult Query<TQuery, TResult>(TQuery query) where TResult : ActionResult where TQuery : ActionBase;

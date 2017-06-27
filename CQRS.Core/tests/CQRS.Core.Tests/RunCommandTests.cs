@@ -19,7 +19,7 @@ namespace CQRS.Core.Tests
             serviceCollection.AddTransient<IAsyncCommandHandler<TestCommand, TestCommandResult>, TestAsyncCommandHandler>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            var actionFacade = serviceProvider.GetService<IActionFacade>();
+            var actionFacade = serviceProvider.GetService<IActionDispatcher>();
 
             var result = await actionFacade.RunAsync<TestCommand, TestCommandResult>(new TestCommand());
 
@@ -33,7 +33,7 @@ namespace CQRS.Core.Tests
             serviceCollection.AddCQRS();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            var actionFacade = serviceProvider.GetService<IActionFacade>();
+            var actionFacade = serviceProvider.GetService<IActionDispatcher>();
 
             var ex = await Assert.ThrowsAsync<ArgumentException>(() => actionFacade.RunAsync<TestCommand, TestCommandResult>(new TestCommand()));
 
@@ -49,7 +49,7 @@ namespace CQRS.Core.Tests
             serviceCollection.AddTransient<ICommandHandler<TestCommand, TestCommandResult>, TestCommandHandler>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            var actionFacade = serviceProvider.GetService<IActionFacade>();
+            var actionFacade = serviceProvider.GetService<IActionDispatcher>();
 
             var result = actionFacade.Run<TestCommand, TestCommandResult>(new TestCommand());
 
@@ -63,7 +63,7 @@ namespace CQRS.Core.Tests
             serviceCollection.AddCQRS();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            var actionFacade = serviceProvider.GetService<IActionFacade>();
+            var actionFacade = serviceProvider.GetService<IActionDispatcher>();
 
             var ex = Assert.Throws<ArgumentException>(() => actionFacade.Run<TestCommand, TestCommandResult>(new TestCommand()));
 
