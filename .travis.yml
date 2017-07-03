@@ -15,5 +15,3 @@ before_script:
 script:
   - ./travis-build.sh
   - ./run-tests.sh
-after_success:
-  - ./after-success.sh
